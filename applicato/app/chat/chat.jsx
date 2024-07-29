@@ -3,6 +3,35 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+const cleanString = (str) => {
+  const unwantedChars = /[\/\\,\*\n"textAI{}:]/g;
+  return str.replace(unwantedChars, '');
+};
+
+const SearchResults = ({ searchResults }) => {
+  return (
+    <div>
+      <h2>検索結果:</h2>
+      {searchResults.length > 0 ? (
+        searchResults.reduce((acc, result, index) => {
+          const cleanedTitle = cleanString(result.title);
+          const cleanedSnippet = cleanString(result.snippet);
+          acc.push(
+            <div key={index}>
+              <h3>{cleanedTitle}</h3>
+              <p>{cleanedSnippet}</p>
+              <a href={result.link} target="_blank" rel="noopener noreferrer">リンク</a>
+            </div>
+          );
+          return acc;
+        }, [])
+      ) : (
+        <p>検索結果がありません。</p>
+      )}
+    </div>
+  );
+};
+
 export const Chat = () => {
   const [userText, setUserText] = useState("");
   const [messages, setMessages] = useState([]);
@@ -10,54 +39,39 @@ export const Chat = () => {
   const [arerugi, setArerugi] = useState("");
   const [kibun, setKibun] = useState("");
   const [youbou, setYoubou] = useState("");
-  const [shokuji, setShokuji] = useState(""); // 新しく追加
+  const [shokuji, setShokuji] = useState("");
   const [isInfoSubmitted, setIsInfoSubmitted] = useState(false);
-  const [searchResults, setSearchResults] = useState([]); // 検索結果の追加
+  const [searchResults, setSearchResults] = useState([]);
 
   const handleInfoSubmit = () => {
     setIsInfoSubmitted(true);
   };
 
-  // 食事場所の情報と料理名を抽出する関数（例: 正規表現を使用）
-  const extractMealInfo = (text) => {
-    const placeRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本|中華|イタリア|スペイン|フランス|アメリカ|インド|ネパール|タイ|韓国)\s*([^\s]+)/g;
-    const dishRegex = /(?:料理|メニュー|食事|定食|セット|ランチ|ディナー|麺|飯|うどん|ラーメン|そば|蕎麦|チャーハン|つけ麵|炒飯|寿司|天ぷら|お好み焼き|しゃぶしゃぶ|すき焼き|焼き鳥|たこ焼き|味噌汁|パスタ|ピザ|ハンバーガー|ステーキ|オムレツ|フィッシュ＆チップス|ラザニア|ローストチキン|グラタン|ビーフシチュー|麻婆豆腐|餃子|北京ダック|酢豚|担々麺|春巻き|八宝菜|エビチリ|小籠包|エスカルゴ|ラタトゥイユ|ブイヤベース|キッシュ|クレームブリュレ|タルタルステーキ|フォアグラ|コンフィ・ド・カナール|ムール貝|ガレット|カルボナーラ|ボロネーゼ|マルゲリータ|リゾット|ティラミス|カプレーゼ|プロシュート|カンノーロ|ジェラート|カレー|タンドリーチキン|サモサ|ナン|チャパティ|ビリヤニ|パラクパニール|ドーサ|バターチキン|ラッシー|トムヤムクン|パッタイ|グリーンカレー|ソムタム|カオソーイ|ガイヤーン|パネーンカレー|ラープ|プーパッポンカリー|マッサマンカレー|タコス|ブリトー|エンチラーダ|ナチョス|ケサディーヤ|グアカモーレ|チリコンカーン|タマレス|サルサ|チュロス|二郎|家系|和菓子|どら焼き|大福|羊羹|団子|かりんとう|カステラ|たい焼き|もなか|クレームブリュレ|マカロン|タルトタタン|エクレア|シュークリーム|フィナンシェ|フラン|クレープ|パリブレスト|ムース|サヴァラン|ティラミス|ジェラート|カンノーロ|パンナコッタ|アフォガート|スフォリアテッラ|ババ|ビスコッティ|セミフレッド|チーズケーキ|ブラウニー|アップルパイ|ドーナツ|カップケーキ|マシュマロ|パンプキンパイ|レッドベルベットケーキ|シナモンロール|バナナスプリット|プリン|バナナスプリット|シュヴァルツヴェルダーキルシュトルテ|バウムクーヘン|シュネーバレン|レープクーヘン|ザクセンケーニッヒスシュトルーデル|プリンツレゲンテントルテ|シュマルツヌーデル|ゲベック|シュトレン|フラン|トゥロン|パステルデナタ|トルタデサンティアゴ|レチェフリータ|ロスコンデレジェス|ペロニラス|ポルボロン|ソバオ|チョコレートトリュフ|プリン|ゼリー|焼肉|うなぎ|パスタ|スパゲッティ|サラダ|唐揚げ|フライ|たまご)\s*([^\s]+)/g;
-
-    const places = [];
-    const dishes = [];
-
-    let match;
-    while ((match = placeRegex.exec(text)) !== null) {
-      places.push(match[1]);
-    }
-    while ((match = dishRegex.exec(text)) !== null) {
-      dishes.push(match[1]);
-    }
-
-    return { places, dishes };
+  const extractRestaurantInfo = (text) => {
+    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本料理|中華料理|イタリア料理|スペイン料理|フランス料理|アメリカ料理|インド料理|ネパール料理|タイ料理|韓国料理)/g;
+    const matches = text.match(restaurantRegex);
+    return matches || [];
   };
 
-  const sendToGoogleCustomSearch = async (aiResponse) => {
+  const sendToGoogleCustomSearch = async (restaurants, userPlace) => {
     try {
-      const apiKey = 'AIzaSyCvHiNBCrfLT469LR8NARnkmLhYEt_qhdA'; // Google Custom Search APIキー
-      const searchEngineId = '74172df7c8b6b4031'; // 検索エンジンID
+      const apiKey = 'AIzaSyCvHiNBCrfLT469LR8NARnkmLhYEt_qhdA'; 
+      const searchEngineId = '74172df7c8b6b4031';
 
-      // AIレスポンスがオブジェクトの場合、適切なフィールドを抽出
-      const queryText = typeof aiResponse === 'object' ? aiResponse.text || '' : aiResponse;
-      const { places, dishes } = extractMealInfo(queryText);
-      if (places.length === 0 && dishes.length === 0) {
-        console.log('食事場所または料理名が見つかりませんでした。');
+      if (restaurants.length === 0 && !userPlace) {
+        console.log('飲食店または食事場所が見つかりませんでした。');
         return;
       }
-      const query = [...places, ...dishes].join(' OR '); // 複数の食事場所と料理名を OR で結合
-      console.log('検索クエリ:', query); // デバッグ用
+
+      const query = [...restaurants, userPlace].filter(Boolean).join(' OR ');
+      console.log('検索クエリ:', query);
 
       const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`;
 
       const response = await axios.get(apiUrl);
-      console.log('Google Custom Search response:', response.data); // デバッグ用
+      console.log('Google Custom Search response:', response.data);
 
-      setSearchResults(response.data.items || []); // 検索結果を設定
+      setSearchResults(response.data.items || []);
     } catch (error) {
       console.error('Error sending data to Google Custom Search:', error);
     }
@@ -86,18 +100,20 @@ export const Chat = () => {
       });
 
       const data = await response.json();
-      console.log('AIレスポンス:', data); // デバッグ用
+      console.log('AIレスポンス:', data);
+
+      const formattedAiResponse = typeof data.ai === 'object' ? JSON.stringify(data.ai).replace(/\\n|\\|[*]/g, '') : data.ai.replace(/\\n|\\|[*]/g, '');
 
       const newMessage = {
         prompt: userText,
-        ai: data.ai,
+        ai: formattedAiResponse,
       };
 
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setUserText("");
 
-      // AIのレスポンスをGoogle Custom Search APIに送信
-      await sendToGoogleCustomSearch(data.ai);
+      const restaurants = extractRestaurantInfo(formattedAiResponse);
+      await sendToGoogleCustomSearch(restaurants, shokuji);
 
     } catch (error) {
       console.log(error);
@@ -137,7 +153,7 @@ export const Chat = () => {
             {messages.map((message, index) => (
               <div key={index}>
                 <p>ユーザー: {message.prompt}</p>
-                <p>AI: {typeof message.ai === 'object' ? JSON.stringify(message.ai) : message.ai}</p>
+                <p>AI: {message.ai}</p>
               </div>
             ))}
           </div>
@@ -149,20 +165,7 @@ export const Chat = () => {
             />
             <button onClick={handleClick}>備考を送信</button>
           </div>
-          <div>
-            <h2>検索結果:</h2>
-            {searchResults.length > 0 ? (
-              searchResults.map((result, index) => (
-                <div key={index}>
-                  <h3>{result.title}</h3>
-                  <p>{result.snippet}</p>
-                  <a href={result.link} target="_blank" rel="noopener noreferrer">リンク</a>
-                </div>
-              ))
-            ) : (
-              <p>検索結果がありません。</p>
-            )}
-          </div>
+          <SearchResults searchResults={searchResults} />
         </div>
       )}
     </div>
