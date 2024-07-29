@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import axios from 'axios';
 
 export const Chat = () => {
   const [userText, setUserText] = useState("");
@@ -11,9 +12,55 @@ export const Chat = () => {
   const [youbou, setYoubou] = useState("");
   const [shokuji, setShokuji] = useState(""); // 新しく追加
   const [isInfoSubmitted, setIsInfoSubmitted] = useState(false);
+  const [searchResults, setSearchResults] = useState([]); // 検索結果の追加
 
   const handleInfoSubmit = () => {
     setIsInfoSubmitted(true);
+  };
+
+  // 食事場所の情報と料理名を抽出する関数（例: 正規表現を使用）
+  const extractMealInfo = (text) => {
+    const placeRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|寿司屋|居酒屋|店)\s*([^\s]+)/g;
+    const dishRegex = /(?:料理|メニュー|食事|定食|セット|ランチ|ディナー)\s*([^\s]+)/g;
+
+    const places = [];
+    const dishes = [];
+
+    let match;
+    while ((match = placeRegex.exec(text)) !== null) {
+      places.push(match[1]);
+    }
+    while ((match = dishRegex.exec(text)) !== null) {
+      dishes.push(match[1]);
+    }
+
+    return { places, dishes };
+  };
+
+  const sendToGoogleCustomSearch = async (aiResponse) => {
+    try {
+      const apiKey = 'AIzaSyCvHiNBCrfLT469LR8NARnkmLhYEt_qhdA'; // Google Custom Search APIキー
+      const searchEngineId = '74172df7c8b6b4031'; // 検索エンジンID
+
+      // AIレスポンスがオブジェクトの場合、適切なフィールドを抽出
+      const queryText = typeof aiResponse === 'object' ? aiResponse.text || '' : aiResponse;
+      const { places, dishes } = extractMealInfo(queryText);
+      if (places.length === 0 && dishes.length === 0) {
+        console.log('食事場所または料理名が見つかりませんでした。');
+        return;
+      }
+      const query = [...places, ...dishes].join(' OR '); // 複数の食事場所と料理名を OR で結合
+      console.log('検索クエリ:', query); // デバッグ用
+
+      const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`;
+
+      const response = await axios.get(apiUrl);
+      console.log('Google Custom Search response:', response.data); // デバッグ用
+
+      setSearchResults(response.data.items || []); // 検索結果を設定
+    } catch (error) {
+      console.error('Error sending data to Google Custom Search:', error);
+    }
   };
 
   const handleClick = async () => {
@@ -39,7 +86,7 @@ export const Chat = () => {
       });
 
       const data = await response.json();
-      console.log(data);
+      console.log('AIレスポンス:', data); // デバッグ用
 
       const newMessage = {
         prompt: userText,
@@ -48,6 +95,10 @@ export const Chat = () => {
 
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setUserText("");
+
+      // AIのレスポンスをGoogle Custom Search APIに送信
+      await sendToGoogleCustomSearch(data.ai);
+
     } catch (error) {
       console.log(error);
     }
@@ -96,7 +147,21 @@ export const Chat = () => {
               type="text"
               onChange={(event) => setUserText(event.target.value)}
             />
-            <button onClick={handleClick}>備考を送信</button>
+            <button onClick={handleClick}>送信</button>
+          </div>
+          <div>
+            <h2>検索結果:</h2>
+            {searchResults.length > 0 ? (
+              searchResults.map((result, index) => (
+                <div key={index}>
+                  <h3>{result.title}</h3>
+                  <p>{result.snippet}</p>
+                  <a href={result.link} target="_blank" rel="noopener noreferrer">リンク</a>
+                </div>
+              ))
+            ) : (
+              <p>検索結果がありません。</p>
+            )}
           </div>
         </div>
       )}
