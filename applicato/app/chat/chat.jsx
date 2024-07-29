@@ -1,5 +1,5 @@
 'use client'
-// テスト
+// user information
 import {useState} from 'react'
 
 export const  Chat = () => {
