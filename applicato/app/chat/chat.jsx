@@ -49,22 +49,16 @@ export const Chat = () => {
 
   const extractRestaurantInfo = (text) => {
     const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本料理|中華料理|イタリア料理|スペイン料理|フランス料理|アメリカ料理|インド料理|ネパール料理|タイ料理|韓国料理)/g;
+    const nameRegex = /(?:「)(.*?)(?:」)/g; // 「店名」を抽出するための正規表現
     const matches = text.match(restaurantRegex);
-    return matches || [];
+    const names = text.match(nameRegex)?.map((match) => match.replace(/[「」]/g, '')) || [];
+    return { matches, names };
   };
 
-  const sendToGoogleCustomSearch = async (restaurants, userPlace) => {
+  const sendToGoogleCustomSearch = async (query) => {
     try {
-      const apiKey = 'AIzaSyCvHiNBCrfLT469LR8NARnkmLhYEt_qhdA'; 
+      const apiKey = 'AIzaSyCvHiNBCrfLT469LR8NARnkmLhYEt_qhdA';
       const searchEngineId = '74172df7c8b6b4031';
-
-      if (restaurants.length === 0 && !userPlace) {
-        console.log('飲食店または食事場所が見つかりませんでした。');
-        return;
-      }
-
-      const query = [...restaurants, userPlace].filter(Boolean).join(' OR ');
-      console.log('検索クエリ:', query);
 
       const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`;
 
@@ -89,6 +83,8 @@ export const Chat = () => {
 
         ユーザーの入力:
         ${userText}
+
+        以下の条件に基づいて具体的な飲食店名を提案してください。
       `;
 
       const response = await fetch('/api/gemini', {
@@ -112,8 +108,9 @@ export const Chat = () => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setUserText("");
 
-      const restaurants = extractRestaurantInfo(formattedAiResponse);
-      await sendToGoogleCustomSearch(restaurants, shokuji);
+      const { matches: restaurants, names } = extractRestaurantInfo(formattedAiResponse);
+      const query = [...restaurants, ...names, shokuji].filter(Boolean).join(' OR ');
+      await sendToGoogleCustomSearch(query);
 
     } catch (error) {
       console.log(error);
