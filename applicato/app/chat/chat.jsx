@@ -159,13 +159,11 @@ export const Chat = () => {
               </div>
             ))}
           </div>
-          <div>
-            <input
-              value={userText}
-              type="text"
-              onChange={(event) => setUserText(event.target.value)}
-            />
-            <button onClick={handleClick}>備考を送信</button>
+          <div>              
+            <div className='send'>
+              <input value={userText} type="text" onChange={(event) => setUserText(event.target.value)} />
+              <button onClick={handleClick}>　SEND</button>
+            </div>
           </div>
           <SearchResults searchResults={searchResults} />
         </div>
