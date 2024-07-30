@@ -24,7 +24,7 @@ body {
       rgb(var(--background-start-rgb)),
       rgb(var(--background-end-rgb))
     );
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: fantasy;
   margin: 0;
   padding: 0;
   display: flex;
@@ -48,15 +48,26 @@ body {
   }
 
   .title {
-    font-size: 2rem;
+    font-size: 100px;
     font-weight: 700;
+    font-family: fantasy;
     margin-bottom: 1rem;
     text-align: center;
   }
 
   .text {
-    font-size: 1rem;
+    font-size: 45px;
+    font-weight: 700;
     line-height: 1.5;
     text-align: justify;
   }
+
+  .send {
+    font-size: 65px;
+      font-weight: 700;
+      font-family: fantasy;
+      line-height: 1.5;
+      text-align: right;
+    }
+  
 }

@@ -122,30 +122,32 @@ export const Chat = () => {
 
   return (
     <div>
-      <h1>チャットを開始</h1>
+      <h1 className="title">START CHATTING</h1>
       {!isInfoSubmitted ? (
         <div>
-          <div>
-            <label>体調:</label>
+          <div className='text'>
+            <label>体　　調　　:</label>
             <input type="text" value={taicho} onChange={(e) => setTaicho(e.target.value)} />
           </div>
-          <div>
-            <label>アレルギー:</label>
+          <div className='text'>
+            <label>アレルギー　:</label>
             <input type="text" value={arerugi} onChange={(e) => setArerugi(e.target.value)} />
           </div>
-          <div>
-            <label>気分:</label>
+          <div className='text'>
+            <label>気　　分　　:</label>
             <input type="text" value={kibun} onChange={(e) => setKibun(e.target.value)} />
           </div>
-          <div>
-            <label>要望:</label>
+          <div className='text'>
+            <label>要　　望　　:</label>
             <input type="text" value={youbou} onChange={(e) => setYoubou(e.target.value)} />
           </div>
-          <div>
-            <label>食事場所:</label>
+          <div className='text'>
+            <label>食事場所　　:</label>
             <input type="text" value={shokuji} onChange={(e) => setShokuji(e.target.value)} />
           </div>
-          <button onClick={handleInfoSubmit}>情報を送信</button>
+          <div className='send'>
+          <button onClick={handleInfoSubmit}>SEND</button>
+          </div>
         </div>
       ) : (
         <div>
