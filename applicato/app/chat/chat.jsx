@@ -48,7 +48,7 @@ export const Chat = () => {
   };
 
   const extractRestaurantInfo = (text) => {
-    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本料理|中華料理|イタリア料理|スペイン料理|フランス料理|アメリカ料理|インド料理|ネパール料理|タイ料理|韓国料理)/g;
+    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本|中華|イタリア|スペイン|フランス|アメリカ|インド|ネパール|タイ|韓国|和菓子)/g;
     const nameRegex = /(?:「)(.*?)(?:」)/g; // 「店名」を抽出するための正規表現
     const matches = text.match(restaurantRegex);
     const names = text.match(nameRegex)?.map((match) => match.replace(/[「」]/g, '')) || [];
