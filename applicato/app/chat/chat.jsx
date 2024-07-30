@@ -110,7 +110,10 @@ export const Chat = () => {
 
       const { matches: restaurants, names } = extractRestaurantInfo(formattedAiResponse);
       const query = [...restaurants, ...names, shokuji].filter(Boolean).join(' OR ');
-      await sendToGoogleCustomSearch(query);
+      
+      if (query) {
+        await sendToGoogleCustomSearch(query);
+      }
 
     } catch (error) {
       console.log(error);
