@@ -52,7 +52,7 @@ export const Chat = () => {
   };
 
   const extractRestaurantInfo = (text) => {
-    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本|中華|イタリア|スペイン|フランス|アメリカ|インド|ネパール|タイ|韓国|和菓子|カレー|ラーメン|焼肉|ステーキ|ケーキ|寿司|ハンバーグ|プリン|二郎|そば|うどん|飯|うなぎ|)/g;
+    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本|中華|イタリア|スペイン|フランス|アメリカ|インド|ネパール|タイ|韓国|和菓子|カレー|ラーメン|焼肉|ステーキ|ケーキ|寿司|ハンバーグ|プリン|二郎|そば|うどん|飯|うなぎ|海鮮)/g;
     const nameRegex = /(?:「)(.*?)(?:」)/g; // 「店名」を抽出するための正規表現
     const matches = text.match(restaurantRegex);
     const names = text.match(nameRegex)?.map((match) => match.replace(/[「」]/g, '')) || [];
@@ -88,7 +88,7 @@ export const Chat = () => {
         ユーザーの入力:
         ${userText}
 
-        以下の条件に基づいて具体的な飲食店名を提案してください。
+        以上の条件に基づいて具体的な料理を提案してください。
       `;
 
       const response = await fetch('/api/gemini', {
