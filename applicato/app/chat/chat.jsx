@@ -11,7 +11,7 @@ const cleanString = (str) => {
 const SearchResults = ({ searchResults }) => {
   return (
     <div className='result'>
-      <h2>検索結果:</h2>
+      <h2 className='gap'>検索結果:</h2>
       {searchResults.length > 0 ? (
         searchResults.reduce((acc, result, index) => {
           const cleanedTitle = cleanString(result.title);
@@ -52,7 +52,7 @@ export const Chat = () => {
   };
 
   const extractRestaurantInfo = (text) => {
-    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本|中華|イタリア|スペイン|フランス|アメリカ|インド|ネパール|タイ|韓国|和菓子|カレー|ラーメン|焼肉|ステーキ|ケーキ|寿司|ハンバーグ|プリン|二郎|そば|うどん|飯|うなぎ|海鮮)/g;
+    const restaurantRegex = /(?:レストラン|食堂|カフェ|ダイナー|料理屋|居酒屋|店|屋|日本|中華|イタリア|スペイン|フランス|アメリカ|インド|ネパール|タイ|韓国|和菓子|カレー|ラーメン|焼肉|ステーキ|ケーキ|寿司|ハンバーグ|プリン|二郎|そば|うどん|飯|うなぎ|海鮮|串カツ|焼き鳥|食|酒|丼|魚)/g;
     const nameRegex = /(?:「)(.*?)(?:」)/g; // 「店名」を抽出するための正規表現
     const matches = text.match(restaurantRegex);
     const names = text.match(nameRegex)?.map((match) => match.replace(/[「」]/g, '')) || [];
@@ -88,7 +88,7 @@ export const Chat = () => {
         ユーザーの入力:
         ${userText}
 
-        以上の条件に基づいて具体的な料理を提案してください。
+        以上の条件に基づいて、おすすめの料理を提案してください。料理名を特に強調してください。
       `;
 
       const response = await fetch('/api/gemini', {
@@ -130,27 +130,27 @@ export const Chat = () => {
       {!isInfoSubmitted ? (
         <div>
           <div className='text'>
-            <label>体　　調　　:</label>
-            <input type="text" value={taicho} onChange={(e) => setTaicho(e.target.value)} />
+            <label>体　　調　:</label>
+            <input className='text-input' type="text" value={taicho} onChange={(e) => setTaicho(e.target.value)} />
           </div>
           <div className='text'>
-            <label>アレルギー　:</label>
-            <input type="text" value={arerugi} onChange={(e) => setArerugi(e.target.value)} />
+            <label>アレルギー:</label>
+            <input className='text-input' type="text" value={arerugi} onChange={(e) => setArerugi(e.target.value)} />
           </div>
           <div className='text'>
-            <label>気　　分　　:</label>
-            <input type="text" value={kibun} onChange={(e) => setKibun(e.target.value)} />
+            <label>気　　分　:</label>
+            <input className='text-input' type="text" value={kibun} onChange={(e) => setKibun(e.target.value)} />
           </div>
           <div className='text'>
-            <label>要　　望　　:</label>
-            <input type="text" value={youbou} onChange={(e) => setYoubou(e.target.value)} />
+            <label>要　　望　:</label>
+            <input className='text-input' type="text" value={youbou} onChange={(e) => setYoubou(e.target.value)} />
           </div>
           <div className='text'>
-            <label>食事場所　　:</label>
-            <input type="text" value={shokuji} onChange={(e) => setShokuji(e.target.value)} />
+            <label>食事場所　:</label>
+            <input className='text-input' type="text" value={shokuji} onChange={(e) => setShokuji(e.target.value)} />
           </div>
-          <div className='send'>
-          <button onClick={handleInfoSubmit}>SEND</button>
+          <div className='text-input'>
+          <button className='send' onClick={handleInfoSubmit}>SEND</button>
           </div>
         </div>
       ) : (
@@ -164,9 +164,9 @@ export const Chat = () => {
             ))}
           </div>
           <div>              
-            <div className='send'>
+            <div className='text-input'>
               <input value={userText} type="text" onChange={(event) => setUserText(event.target.value)} />
-              <button onClick={handleClick}>　SEND</button>
+              <button className='send' onClick={handleClick}>　SEND</button>
             </div>
           </div>
           <SearchResults searchResults={searchResults} />
