@@ -10,7 +10,7 @@ const cleanString = (str) => {
 
 const SearchResults = ({ searchResults }) => {
   return (
-    <div>
+    <div className='result'>
       <h2>検索結果:</h2>
       {searchResults.length > 0 ? (
         searchResults.reduce((acc, result, index) => {
@@ -18,9 +18,13 @@ const SearchResults = ({ searchResults }) => {
           const cleanedSnippet = cleanString(result.snippet);
           acc.push(
             <div key={index}>
+              <div className='introduction'>
               <h3>{cleanedTitle}</h3>
               <p>{cleanedSnippet}</p>
-              <a href={result.link} target="_blank" rel="noopener noreferrer">リンク</a>
+              </div>
+              <div className='web'>
+              <a href={result.link} target="_blank" rel="noopener noreferrer">WEBサイトへ</a>
+              </div>
             </div>
           );
           return acc;
@@ -153,7 +157,7 @@ export const Chat = () => {
         <div>
           <div>
             {messages.map((message, index) => (
-              <div key={index}>
+              <div className='answer' key={index}>
                 <p>ユーザー: {message.prompt}</p>
                 <p>AI: {message.ai}</p>
               </div>

@@ -70,4 +70,27 @@ body {
       text-align: right;
     }
   
+    .answer {
+      margin: 0 100px 70px 100px;
+      font-size: 35px;
+      font-weight: bold;
+      letter-spacing: normal;
+    }
+
+    .result {
+      margin: 100px 100px 70px 100px;
+      font-size: 35px;
+      font-weight: bold;
+      letter-spacing: normal;
+    }
+
+    .introduction {
+      
+    }
+
+    .web {
+      font-size: 40px;
+      font-weight: bold;
+      text-align: right;
+    }
 }
